@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fastify Files</title>
+    <link rel="stylesheet" href="https://unpkg.com/purecss@2.1.0/build/pure-min.css" />
+    <style>
+      a {
+        border-radius: 10px;
+        box-shadow: 0 0 2px #888;
+        display: block;
+        margin: 5px;
+        padding: 5px;
+      }
+    </style>
+    <script src="https://unpkg.com/lightue@0.2.1/lightue.min.js"></script>
+  </head>
+  <body>
+    <script>
+      var S = Lightue.useState({
+          curPath: ['/'],
+          files: [],
+        }),
+        xhr = new XMLHttpRequest()
+      xhr.responseType = 'json'
+      xhr.onload = () => {
+        S.files = xhr.response.files
+      }
+      function getLs() {
+        xhr.open('get', 'ls?path=' + encodeURIComponent(S.curPath.join('')))
+        xhr.send()
+      }
+      getLs()
+      Lightue({
+        files: {
+          pureMenu: {
+            $class: { 'pure-menu-horizontal': 1 },
+            pureMenuHeading: {
+              $tag: 'a',
+              _href: '#',
+              $class: { 'pure-menu-link': 1 },
+              $$: 'Fastify Files',
+            },
+            pureMenuList: {
+              $tag: 'ul',
+              $$: () =>
+                S.curPath.map((level, i) => {
+                  return {
+                    $tag: 'li',
+                    _class: 'pure-menu-item',
+                    $$: {
+                      $tag: 'a',
+                      _href: '#',
+                      _class: 'pure-menu-link',
+                      $$: level,
+                      onclick: (e) => {
+                        e.preventDefault()
+                        if (i < S.curPath.length - 1) {
+                          S.curPath = S.curPath.slice(0, i + 1)
+                          getLs()
+                        }
+                      },
+                    },
+                  }
+                }),
+            },
+          },
+          back: {
+            $tag: 'a',
+            _href: '#',
+            $$: '..',
+            onclick: (e) => {
+              e.preventDefault()
+              if (S.curPath.length > 1) {
+                S.curPath = S.curPath.slice(0, -1)
+                getLs()
+              }
+            },
+          },
+          $$: () =>
+            S.files.map((file) => ({
+              $tag: 'a',
+              _href: S.curPath.join('') + file.name,
+              $$: file.name,
+              onclick: (e) => {
+                if (file.dir) {
+                  e.preventDefault()
+                  S.curPath.push(file.name + '/')
+                  getLs()
+                }
+              },
+            })),
+        },
+      })
+    </script>
+  </body>
+</html>

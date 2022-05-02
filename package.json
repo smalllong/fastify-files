@@ -1,0 +1,15 @@
+{
+  "name": "fastify-files",
+  "version": "0.0.1",
+  "description": "a simple server which lets you browse and download files",
+  "main": "index.js",
+  "author": "Smalllong <m18818276304@icloud.com>",
+  "license": "MIT",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "@fastify/static": "^5.0.1",
+    "fastify": "^3.29.0"
+  }
+}
