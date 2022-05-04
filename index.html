@@ -14,11 +14,12 @@
         padding: 5px;
       }
     </style>
-    <script src="https://unpkg.com/lightue@0.2.1/lightue.min.js"></script>
+    <script src="https://unpkg.com/lightue@0.2.2/lightue.min.js"></script>
   </head>
   <body>
     <script>
-      var S = Lightue.useState({
+      var L = Lightue,
+        S = L.useState({
           curPath: ['/'],
           files: [],
         }),
@@ -32,42 +33,33 @@
         xhr.send()
       }
       getLs()
-      Lightue({
-        files: {
-          pureMenu: {
-            $class: { 'pure-menu-horizontal': 1 },
-            pureMenuHeading: {
-              $tag: 'a',
-              _href: '#',
-              $class: { 'pure-menu-link': 1 },
-              $$: 'Fastify Files',
-            },
-            pureMenuList: {
-              $tag: 'ul',
-              $$: () =>
-                S.curPath.map((level, i) => {
-                  return {
-                    $tag: 'li',
-                    _class: 'pure-menu-item',
-                    $$: {
-                      $tag: 'a',
-                      _href: '#',
-                      _class: 'pure-menu-link',
-                      $$: level,
-                      onclick: (e) => {
-                        e.preventDefault()
-                        if (i < S.curPath.length - 1) {
-                          S.curPath = S.curPath.slice(0, i + 1)
-                          getLs()
-                        }
-                      },
+      L({
+        pureMenu: L.div.pureMenuHorizontal({
+          pureMenuHeading: L.a.pureMenuLink({
+            _href: '#',
+            $$: 'Fastify Files',
+          }),
+          pureMenuList: L.ul({
+            $$: () =>
+              S.curPath.map((level, i) =>
+                L.li.pureMenuItem({
+                  pureMenuLink: L.a({
+                    _href: '#',
+                    $$: level,
+                    onclick: (e) => {
+                      e.preventDefault()
+                      if (i < S.curPath.length - 1) {
+                        S.curPath = S.curPath.slice(0, i + 1)
+                        getLs()
+                      }
                     },
-                  }
-                }),
-            },
-          },
-          back: {
-            $tag: 'a',
+                  }),
+                })
+              ),
+          }),
+        }),
+        files: {
+          back: L.a({
             _href: '#',
             $$: '..',
             onclick: (e) => {
@@ -77,20 +69,21 @@
                 getLs()
               }
             },
-          },
+          }),
           $$: () =>
-            S.files.map((file) => ({
-              $tag: 'a',
-              _href: S.curPath.join('') + file.name,
-              $$: file.name,
-              onclick: (e) => {
-                if (file.dir) {
-                  e.preventDefault()
-                  S.curPath.push(file.name + '/')
-                  getLs()
-                }
-              },
-            })),
+            S.files.map((file) =>
+              L.a({
+                _href: S.curPath.join('') + file.name,
+                $$: file.name,
+                onclick: (e) => {
+                  if (file.dir) {
+                    e.preventDefault()
+                    S.curPath.push(file.name + '/')
+                    getLs()
+                  }
+                },
+              })
+            ),
         },
       })
     </script>
