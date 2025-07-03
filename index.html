@@ -14,7 +14,7 @@
         padding: 5px;
       }
     </style>
-    <script src="https://unpkg.com/lightue@0.2.2/lightue.min.js"></script>
+    <script src="https://unpkg.com/lightue@0.4.4/dist/lightue.min.js"></script>
   </head>
   <body>
     <script>
@@ -22,6 +22,7 @@
         S = L.useState({
           curPath: ['/'],
           files: [],
+          curVideo: '',
         }),
         xhr = new XMLHttpRequest()
       xhr.responseType = 'json'
@@ -36,7 +37,7 @@
       L({
         pureMenu: L.div.pureMenuHorizontal({
           pureMenuHeading: L.a.pureMenuLink({
-            _href: '#',
+            _href: '/',
             $$: 'Fastify Files',
           }),
           pureMenuList: L.ul({
@@ -73,6 +74,8 @@
           $$: () =>
             S.files.map((file) =>
               L.a({
+                $if: file.name[0] != '.',
+                _style: 'display: flex; justify-content: space-between;',
                 _href: S.curPath.join('') + file.name,
                 $$: file.name,
                 onclick: (e) => {
@@ -82,9 +85,31 @@
                     getLs()
                   }
                 },
+                play: file.name.endsWith('.mp4') && L.a({
+                  $$: 'play',
+                  onclick: (e) => {
+                    e.preventDefault()
+                    S.curVideo = S.curPath.join('') + file.name
+                  }
+                })
               })
             ),
         },
+        video: {
+          $if: S.$curVideo,
+          $tag: 'video',
+          _autoplay: 'true',
+          _src: S.$curVideo,
+          _controls: true,
+          _style: 'position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;'
+        },
+        videoClose: L.button({
+          $if: S.$curVideo,
+          _style: 'position: fixed; top: 0; right: 0; font-size: 2em',
+          _type: 'button',
+          $$: 'x',
+          onclick: () => S.curVideo = ''
+        })
       })
     </script>
   </body>
